@@ -373,3 +373,22 @@ def test_computer_menus_keep_syntax_hints_under_the_menu_and_shortcuts_beside() 
     app.state.run_action("open_menu", "cassim")
     app.refresh()
     assert any(t.value == "Alt+Shift+C" and not t.italic for t in texts_in(app.view.control))
+
+
+def test_a_menu_hint_is_a_shortcut_only_when_it_names_keys() -> None:
+    """SDD-15 section 9.1: shortcuts (capitalised) beside the item; anything else under it."""
+    from cassim.devices.nspire.ui.views import is_shortcut  # noqa: PLC0415
+
+    for hint in (
+        "Ctrl+C",
+        "Ctrl+◀",
+        "Ctrl+▲",
+        "Alt+Shift+H",
+        "Ctrl+Shift+Z",
+        "F1",
+        "Esc",
+        "Delete",
+    ):
+        assert is_shortcut(hint), hint
+    for hint in ("F", "c", "normPdf(XVal,μ,σ)", "Not in CASSim yet", "Fraction (ctrl+÷)", "ctrl+C"):
+        assert not is_shortcut(hint), hint

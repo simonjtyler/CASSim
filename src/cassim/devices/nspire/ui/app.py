@@ -215,7 +215,7 @@ class App:
         self.sheet_line = ""  # the debug SHEET line last printed
         self.sheet_selection_line = ""
         self.plan: HandheldPlan | None = None  # the last Handheld arrangement
-        self.shape: tuple[Mode, bool, bool, bool, bool, bool] | None = (
+        self.shape: tuple[Mode, bool, bool, bool, bool, bool, bool] | None = (
             None  # what the layout is built from
         )
         self.holder: ft.Container | None = None  # the splitter's box in a portrait layout
@@ -1527,8 +1527,10 @@ class App:
             full_screen_height(plan, height, units[1], sizing) if full else state.px(SCREEN_H)
         )
         view.expand = False
-        first = plan.side_by_side and system.keypad_first
-        shape = (state.mode, plan.side_by_side, phone, system.zoom > 1, full, first)
+        # Tablet with the keypad moved left; not on a phone, which has no bar to move it back
+        first = plan.side_by_side and system.keypad_first and not phone
+        controls = plan.side_by_side and system.computer_column_controls  # the bar's arrows
+        shape = (state.mode, plan.side_by_side, phone, system.zoom > 1, full, first, controls)
         if shape == self.shape:
             self.size_splitter(plan)
             return
