@@ -25,7 +25,8 @@ PRIVACY = (
 COPYRIGHT = "Copyright (c) 2026 Simon Tyler and CASSim contributors"
 LICENCE = (
     "CASSim is vibe-coded and is released under the MIT licence: anyone may use, copy, change "
-    "and share it, keeping the copyright notice. It comes with no warranty. " + COPYRIGHT + "."
+    "and share it, keeping the copyright notice. It comes with no warranty. " + COPYRIGHT + ". "
+    "The full text is LICENSE.txt on this site."
 )
 
 # The help pages: `docs/wiki/`, built by `tools.wiki_site` and deployed to their own site.
