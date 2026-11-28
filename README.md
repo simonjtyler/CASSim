@@ -198,7 +198,8 @@ python -m tools.replay                # corpus progress
 
 ## Licence
 
-Released under the [Unlicense](LICENSE): public domain. Third-party notices for Flet, Pyodide,
-SymPy, SciPy, NumPy and the bundled font are in the app's About dialog.
+Released under the [MIT licence](LICENSE), copyright (c) 2026 Simon Tyler and CASSim contributors. Third-party
+notices for Flet, Pyodide, SymPy, mpmath, CodeMirror, Flutter and the bundled fonts are in the
+app's About dialog; Flutter's full list is `assets/NOTICES` on each site.
 
 No TI logos, artwork or ROM content are included. 

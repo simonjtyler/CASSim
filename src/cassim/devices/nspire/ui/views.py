@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import re
 import time
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -215,6 +216,20 @@ MENU_STEP_Y = 6  # each submenu sits this far lower than its parent
 # The pointer's arrow in handheld pixels, tip at (0, 0): CASSim's own drawing
 POINTER_SHAPE = ((0, 0), (0, 13), (3.5, 10), (6, 15.5), (8, 14.6), (5.6, 9.4), (10, 9.4))
 POINTER_TICK = 1 / 30  # seconds between the pointer's moves
+
+
+# A hint that is a keyboard shortcut (Ctrl+N, Alt+Shift+H, F1, Esc): beside its menu item in
+# Computer view. Any other hint (a command's syntax, "Not in CASSim yet") goes under the menu.
+_MODIFIERS = r"(?:(?:Ctrl|Alt|Shift|Cmd)\+)"
+_NAMED_KEYS = r"(?:F\d{1,2}|Esc|Enter|Tab|Delete|Del|Home|End|Backspace|Insert|Page ?Up|Page ?Down)"
+_SHORTCUT = re.compile(
+    rf"{_MODIFIERS}+\S"  # a modifier and one key: Ctrl+C, Ctrl+◀
+    rf"|{_MODIFIERS}*{_NAMED_KEYS}"  # a named key, alone or with modifiers: F1, Delete
+)
+
+
+def is_shortcut(hint: str) -> bool:
+    return bool(hint) and _SHORTCUT.fullmatch(hint.strip()) is not None
 
 
 def pointer_mark(scale: float, theme: Theme) -> ft.Container:
@@ -1305,7 +1320,7 @@ class CalculatorView:
             items.extend(self._menu_row(depth, panel, n, wide=wide, active=last) for n in window)
         if window.stop < lines:
             items.append(self._more("▼", shown * columns, active=last))
-        hinted = last and view.hint and (not wide or panel.columns)
+        hinted = last and view.hint and (not wide or panel.columns or not is_shortcut(view.hint))
         pad, gap = px(4), px(1)
         self._boxes.append(
             MenuBox(
@@ -1450,7 +1465,7 @@ class CalculatorView:
             other.label.startswith(("✓", "●")) for other in panel.rows
         ):
             parts.insert(1, label_text(row.mark, size=px(11), color=colour, width=px(10)))
-        if wide and row.hint:
+        if wide and is_shortcut(row.hint):
             hint_colour = colour if on else theme.menu_hint
             parts.append(ft.Text(row.hint, size=px(11), color=hint_colour, no_wrap=True))
         if row.submenu:

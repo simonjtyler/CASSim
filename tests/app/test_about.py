@@ -29,11 +29,14 @@ def test_disclaimer_says_what_nfr_leg_002_requires() -> None:
 
 
 def test_privacy_and_licence_statements() -> None:
-    """NFR-SEC-001: no telemetry. NFR-LEG-003: the Unlicense."""
+    """NFR-SEC-001: no telemetry. NFR-LEG-003: the MIT licence, with its copyright line."""
     assert "no server and collects nothing: no telemetry and no analytics" in about.PRIVACY
     assert "never runs Python or a program" in about.PRIVACY
     assert "is vibe-coded and is released" in about.LICENCE
-    assert "Unlicense" in about.LICENCE
+    assert "MIT licence" in about.LICENCE
+    assert "Unlicense" not in about.LICENCE
+    assert about.COPYRIGHT == "Copyright (c) 2026 Simon Tyler and CASSim contributors"
+    assert about.COPYRIGHT in about.LICENCE
     assert about.WIKI_URL in about.HELP
 
 
@@ -113,6 +116,8 @@ def test_notices_cover_the_shipped_third_party_parts() -> None:
     licence. SciPy and NumPy are not shipped (decision 0031), so they are not named."""
     names = {notice.name for notice in about.NOTICES}
     assert {"Flet", "Pyodide", "SymPy", "mpmath", "Noto Sans, Math, Symbols 2 and SC"} <= names
+    assert "CodeMirror" in names  # the Pseudocode editor
+    assert any(name.startswith("Flutter") for name in names)
     assert not {"SciPy", "NumPy"} & names
     assert all(notice.licence for notice in about.NOTICES)
 

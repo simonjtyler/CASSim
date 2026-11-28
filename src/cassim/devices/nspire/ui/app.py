@@ -58,6 +58,7 @@ from cassim.devices.nspire.ui.layout import (
     PHONE_MARGIN,
     SCREEN_H,
     SCREEN_W,
+    SIDE_SPLITTER,
     SPLITTER,
     STATUS_H,
     HandheldPlan,
@@ -214,7 +215,7 @@ class App:
         self.sheet_line = ""  # the debug SHEET line last printed
         self.sheet_selection_line = ""
         self.plan: HandheldPlan | None = None  # the last Handheld arrangement
-        self.shape: tuple[Mode, bool, bool, bool, bool] | None = (
+        self.shape: tuple[Mode, bool, bool, bool, bool, bool, bool] | None = (
             None  # what the layout is built from
         )
         self.holder: ft.Container | None = None  # the splitter's box in a portrait layout
@@ -1526,7 +1527,10 @@ class App:
             full_screen_height(plan, height, units[1], sizing) if full else state.px(SCREEN_H)
         )
         view.expand = False
-        shape = (state.mode, plan.side_by_side, phone, system.zoom > 1, full)
+        # Tablet with the keypad moved left; not on a phone, which has no bar to move it back
+        first = plan.side_by_side and system.keypad_first and not phone
+        controls = plan.side_by_side and system.computer_column_controls  # the bar's arrows
+        shape = (state.mode, plan.side_by_side, phone, system.zoom > 1, full, first, controls)
         if shape == self.shape:
             self.size_splitter(plan)
             return
@@ -1534,6 +1538,8 @@ class App:
         parts: list[ft.Control] = [view, self.keypad.control]
         if not phone:
             parts.insert(1, self.splitter(plan))
+        if first:  # Tablet with the keypad moved left of the screen
+            parts.reverse()
         gap = GAP / 2
         self.layout.alignment = ft.Alignment.CENTER
         self.layout.content = (
@@ -1665,31 +1671,32 @@ class App:
         the column left of it one place right. A tap area that takes no keyboard focus, so Tab
         and Enter stay the calculator's keys; with the keyboard column controls on (Settings)
         it is a button that Tab reaches."""
+        tip = f"Move {COMPUTER_PANEL_NAMES[name].lower()} {'left' if step < 0 else 'right'}"
+        return self._bar_arrow(step, tip, lambda: self._move_column(name, step))
+
+    def _bar_arrow(self, step: int, tip: str, act: Callable[[], None]) -> ft.Control:
+        """< (step -1) or > (step 1) beside a bar's line. Each icon fills its box and sits
+        against the line, so the two are mirror images round it."""
         icon = ft.Icons.CHEVRON_LEFT if step < 0 else ft.Icons.CHEVRON_RIGHT
         colour = self.theme.key_label
-        tip = f"Move {COMPUTER_PANEL_NAMES[name].lower()} {'left' if step < 0 else 'right'}"
-
-        def move(_: object) -> None:
-            self._move_column(name, step)
-
         if self.state.system.computer_column_controls:
             return ft.IconButton(
                 icon=ft.Semantics(label=tip, content=ft.Icon(icon)),
                 tooltip=tip,
-                on_click=move,
+                on_click=lambda _: act(),
                 icon_color=colour,
-                icon_size=14,
+                icon_size=COLUMN_ARROW_W,
                 width=COLUMN_ARROW_W,
                 height=COLUMN_ARROW_H,
                 padding=0,
             )
         return ft.Container(
-            ft.Icon(icon, size=14, color=colour),
+            ft.Icon(icon, size=COLUMN_ARROW_W, color=colour),
             width=COLUMN_ARROW_W,
             height=COLUMN_ARROW_H,
-            alignment=ft.Alignment.CENTER,
+            alignment=ft.Alignment.CENTER_RIGHT if step < 0 else ft.Alignment.CENTER_LEFT,
             tooltip=tip,
-            on_click=move,
+            on_click=lambda _: act(),
             ink=False,  # not focusable: Tab and Enter must not land on it
         )
 
@@ -1880,7 +1887,10 @@ class App:
             if e.global_delta is None or self.plan is None:
                 return
             delta = e.global_delta.x if self.plan.side_by_side else e.global_delta.y
-            # The keypad is on the right or at the bottom, so dragging towards the screen grows it.
+            # Dragging towards the screen grows the keypad: the keypad is on the right or at the
+            # bottom, or (Tablet, moved) on the left
+            if self.plan.side_by_side and self.state.system.keypad_first:
+                delta = -delta
             room = self.plan.extent * max(self.state.system.zoom, 0.01)
             current = self.state.system.keypad_share or self.plan.share
             self.state.system.keypad_share = clamp_share(current - delta / room)
@@ -1893,10 +1903,26 @@ class App:
         def done(_: object) -> None:
             self.shell.write(SYSTEM_KEY, self.state.system.dumps())
 
+        if side:  # Tablet: < | > round the grip swap the screen and the keypad
+            first = self.state.system.keypad_first
+            grip = ft.Row(
+                [
+                    self._bar_arrow(
+                        -1, f"Move the {'screen' if first else 'keypad'} left", self.swap_keypad
+                    ),
+                    grip,
+                    self._bar_arrow(
+                        1, f"Move the {'keypad' if first else 'screen'} right", self.swap_keypad
+                    ),
+                ],
+                spacing=0,
+                tight=True,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            )
         bar = ft.Container(
             grip,
             alignment=ft.Alignment.CENTER,
-            width=SPLITTER if side else None,
+            width=SIDE_SPLITTER if side else None,
             height=None if side else SPLITTER,
             tooltip="Drag to resize the keypad; double-click to reset",
         )
@@ -1918,6 +1944,11 @@ class App:
         self.holder = ft.Container(detector)  # a column would shrink the bar to its grip
         self.size_splitter(plan)
         return self.holder
+
+    def swap_keypad(self) -> None:
+        """Tablet: put the keypad on the other side of the screen (kept with the settings)."""
+        self.state.system.keypad_first = not self.state.system.keypad_first
+        self.on_system_change()
 
     def resize_soon(self) -> None:
         """Queue one redraw for the splitter. Drag steps arrive faster than the screen and keys

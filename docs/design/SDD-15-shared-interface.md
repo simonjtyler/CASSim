@@ -161,6 +161,7 @@ On the first visit the screen size picks the view, and keeps picking it on resiz
 | A dialog's title matches the item that opened it | Settings… opens "Settings" | Handheld Setup… opens "System Settings" |
 | A command CASSim does not do yet | Greyed, with the hint "Not in CASSim yet" | Hidden |
 | Shortcuts: each key capitalised, joined with + | Ctrl+O, Alt+Shift+C | ctrl+O |
+| Menu hints: a keyboard shortcut sits beside its item; any other hint (a command's syntax, "Not in CASSim yet") goes in the line under the menu for the highlighted item, in every view | Normal Pdf… with normPdf(XVal,μ,σ) under the menu | the syntax beside each item, widening the menu past the screen |
 | The product name comes from `about.product_name()` | About CASSimᵝ… on the testing site | A literal "About CASSim…"; the page title "CASSim-pseudocode" |
 
 Sentence case changes only the capital letters of a device menu's labels. Their words, order and numbering still follow the device. Command names keep their spelling (`completeSquare`, `solve`).

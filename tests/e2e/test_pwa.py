@@ -507,6 +507,25 @@ def test_the_build_records_the_versions_it_ships(site: tuple[Path, str]) -> None
         )
 
 
+def test_the_mit_licence_goes_with_every_copy(site: tuple[Path, str]) -> None:
+    """NFR-LEG-003 (decision 0042): the licence's full text is on the site and in both archives
+    the workers unpack."""
+    dist, _ = site
+
+    def text(data: bytes) -> str:  # the same notice, whichever line endings the checkout has
+        return "\n".join(data.decode("utf-8").splitlines())
+
+    licence = text((publish.ROOT / "LICENSE").read_bytes())
+    assert "MIT License" in licence
+    assert text((dist / "LICENSE.txt").read_bytes()) == licence
+    with tarfile.open(dist / "app.tar.gz") as archive:
+        member = archive.extractfile("LICENSE")
+        assert member is not None
+        assert text(member.read()) == licence
+    with zipfile.ZipFile(dist / "cassim.zip") as archive:
+        assert text(archive.read("LICENSE")) == licence
+
+
 def test_cancel_ends_a_long_calculation_and_keeps_variables(
     browser: Browser, site: tuple[Path, str]
 ) -> None:

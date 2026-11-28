@@ -347,3 +347,48 @@ def test_variable_delete_can_be_undone_and_redone(monkeypatch: pytest.MonkeyPatc
     asyncio.run(app._apply_variable_history("redo"))
     assert not session.is_defined("a")
     assert not session.is_defined("f")
+
+
+def texts_in(control: ft.Control) -> list[ft.Text]:
+    return [c for c in descendants(control) if isinstance(c, ft.Text) and isinstance(c.value, str)]
+
+
+def test_computer_menus_keep_syntax_hints_under_the_menu_and_shortcuts_beside() -> None:
+    """A command's syntax goes in the line under the menu, as in Tablet and Handheld, so the
+    menu stays narrow; a keyboard shortcut still sits beside its item."""
+    app, _ = computer_app()
+    for key in ("menu", "5", "5"):  # Menu > Probability > Distributions
+        app.state.press_keypad(key) if key == "menu" else app.state.key_event(key)
+    app.refresh()
+    menu = app.state.screen().menu
+    assert menu is not None
+    hint = menu.hint
+    assert hint.startswith("normPdf(")
+    shown = [t for t in texts_in(app.view.control) if t.value == hint]
+    assert len(shown) == 1  # only under the menu
+    assert shown[0].italic
+    app.state.key_event("Escape")
+    app.state.key_event("Escape")
+    app.state.key_event("Escape")
+    app.state.run_action("open_menu", "cassim")
+    app.refresh()
+    assert any(t.value == "Alt+Shift+C" and not t.italic for t in texts_in(app.view.control))
+
+
+def test_a_menu_hint_is_a_shortcut_only_when_it_names_keys() -> None:
+    """SDD-15 section 9.1: shortcuts (capitalised) beside the item; anything else under it."""
+    from cassim.devices.nspire.ui.views import is_shortcut  # noqa: PLC0415
+
+    for hint in (
+        "Ctrl+C",
+        "Ctrl+◀",
+        "Ctrl+▲",
+        "Alt+Shift+H",
+        "Ctrl+Shift+Z",
+        "F1",
+        "Esc",
+        "Delete",
+    ):
+        assert is_shortcut(hint), hint
+    for hint in ("F", "c", "normPdf(XVal,μ,σ)", "Not in CASSim yet", "Fraction (ctrl+÷)", "ctrl+C"):
+        assert not is_shortcut(hint), hint

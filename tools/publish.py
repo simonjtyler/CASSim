@@ -790,6 +790,7 @@ def write_app_archive(dist: Path, bundle: Bundle) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         shutil.copyfile(STAGE / "src" / "main.py", root / "main.py")
+        shutil.copyfile(LICENCE, root / "LICENSE")
         copy_cassim(root, dist, home, bundle, ui=True)
         wheels = [
             pypi_wheel("flet", flet_version()),
@@ -814,6 +815,15 @@ FALLBACK_FONTS = ROOT / "tools" / "fallback_fonts"
 ICON_FONT = ROOT / "tools" / "icon_font" / "NotoSans-Bold-icon.ttf"
 
 
+# CASSim's licence (decision 0042): the site serves it as LICENSE.txt, and both archives carry it
+# as LICENSE.
+LICENCE = ROOT / "LICENSE"
+
+
+def write_licence(dist: Path) -> None:
+    shutil.copyfile(LICENCE, dist / "LICENSE.txt")
+
+
 def vendor_fallback_fonts(dist: Path) -> None:
     shutil.copytree(FALLBACK_FONTS, dist / "assets" / "fonts", dirs_exist_ok=True)
 
@@ -824,6 +834,7 @@ def write_engine_zip(dist: Path, bundle: Bundle) -> None:
     lib = "/cassim_lib"  # where `ENGINE_JS` in cassim.app.web unpacks it
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
+        shutil.copyfile(LICENCE, root / "LICENSE")
         copy_cassim(root, dist, lib, bundle, ui=False)
         wheels = [pyodide_wheel(dist, name) for name in bundle.engine_packages]
         unpack_wheels(dist, wheels, root, lib)
@@ -1161,6 +1172,7 @@ def build(
     if not cdn:
         vendor_pyodide(dist)
         vendor_fallback_fonts(dist)
+    write_licence(dist)
     write_app_archive(dist, bundle)
     write_engine_zip(dist, bundle)
     write_icons(dist, bundle)

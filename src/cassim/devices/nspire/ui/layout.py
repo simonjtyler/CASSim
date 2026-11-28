@@ -40,6 +40,7 @@ DEFAULT_RATIO = 0.8  # the keypad's scale relative to the screen's until the spl
 MIN_SHARE, MAX_SHARE = 0.15, 0.8  # the splitter's range: the keypad's share of the room
 MIN_ZOOM, MAX_ZOOM = 0.5, 2.0
 SPLITTER = 10  # px: the draggable bar between the screen and the keypad
+SIDE_SPLITTER = 26  # px: Tablet's bar: an 11 px < and > either side of its 4 px grip
 MIN_PART_SCALE = 0.2
 COMPUTER_MIN_WORKSPACE = 320
 COMPUTER_MIN_KEYPAD = 240
@@ -72,6 +73,11 @@ class Sizing:
     def between(self) -> float:
         """Px between the screen and the keypad: two half gaps round the splitter, or one."""
         return GAP + SPLITTER if self.splitter else GAP / 2
+
+    @property
+    def beside(self) -> float:
+        """Px between the screen and the keypad side by side (Tablet), round its wider bar."""
+        return GAP + SIDE_SPLITTER if self.splitter else GAP / 2
 
 
 @dataclass(frozen=True)
@@ -111,7 +117,7 @@ def handheld_plan(
     def frame(side: bool) -> Frame:
         """Room along the split, the keypad and screen along it, the room across, and theirs."""
         if side:
-            return room_w - sizing.between, pad_w0, SCREEN_W, room_h, pad_h0, SCREEN_H
+            return room_w - sizing.beside, pad_w0, SCREEN_W, room_h, pad_h0, SCREEN_H
         return room_h - sizing.between, pad_h0, SCREEN_H, room_w, pad_w0, SCREEN_W
 
     if sizing.share is None:

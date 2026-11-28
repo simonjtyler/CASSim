@@ -6,7 +6,7 @@ The calculator apps have three views. Handheld and Tablet show the calculator it
 
 Looks like the calculator: a screen with the on-screen keypad below it. Tap or click the keys, or type on a keyboard. On a phone this view fills the screen: the screen and the keys both reach across it.
 
-- Drag the bar between the screen and the keypad to change their sizes.
+- Drag the bar between the screen and the keypad to change their sizes. In Tablet, tap **<** or **>** beside the bar to put the keypad on the other side of the screen.
 - The keypad letters can be ABC or QWERTY (see [[Settings]]).
 - In full screen (CASSim ▸ **Fullscreen**) or the installed app, the calculator's screen grows taller to use the whole height, up to the top edge of the phone.
 - In the installed app on a phone, the screen uses the camera cutout area by default. Choose CASSim ▸ **Avoid cutout** to keep the calculator within the safe area (a ✓ shows it is on), and choose it again to use that space. The choice lasts until the app is closed or reloaded.
