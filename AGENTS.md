@@ -42,7 +42,7 @@ See PLAN.md for milestones and architecture, docs/SRS.md for requirements, and d
   - Each device is a plug-in package (`devices/nspire`, `classpad`, `pseudocode`, `prime`: long ids in code, short names for bundles and sites) that never imports another device; device UIs are separate from the shell. Pseudocode (the Code view) is a device with its own site (Q23 revised).
   - A batch merge to `main` deploys testing (when the app changed) and the help pages (when `docs/wiki` changed); a GitHub release deploys stable. Never deploy stable by hand with wrangler unless Simon asks.
 - Decisions from the SRS review (2026-11-02; see `docs/SRS.md`):
-  - CASSim is a simulator, not a hardware emulation. "Close enough not to confuse a student or teacher" is the bar; exact text only where a case says `compare: exact`. Released under the Unlicense.
+  - CASSim is a simulator, not a hardware emulation. "Close enough not to confuse a student or teacher" is the bar; exact text only where a case says `compare: exact`. Released under the MIT licence (decision 0042, 2026-11-28).
   - No telemetry or analytics of any kind; no server; share links carry the document in the URL fragment (keep under about 2,000 characters, else export a file). Imported documents and share links never auto-run Python or programs.
   - Computer and Handheld modes are equal top priority; Tablet/demo is Should. Dark is the default theme; themes come from a user-editable config file with a fallback to Dark.
   - Primary test targets are Chromebooks, Chrome and Safari; Edge and Firefox are smoke-tested. Hosting is any free static host.

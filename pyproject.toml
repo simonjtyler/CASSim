@@ -3,6 +3,8 @@ name = "cassim"
 version = "0.2.2"
 description = "Browser simulation of the TI-Nspire CX CAS (Python/SymPy via Pyodide, UI in Flet)."
 authors = [{ name = "Simon Tyler" }]
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.14"
 dependencies = [
     "openpyxl>=3.1.5",

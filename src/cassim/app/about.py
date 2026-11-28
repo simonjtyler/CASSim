@@ -22,9 +22,10 @@ PRIVACY = (
     "shared link or file never runs Python or a program by itself."
 )
 
+COPYRIGHT = "Copyright (c) 2026 Simon Tyler and CASSim contributors"
 LICENCE = (
-    "CASSim is vibe-coded and is released under the Unlicense: it is free and unencumbered "
-    "software in the public domain."
+    "CASSim is vibe-coded and is released under the MIT licence: anyone may use, copy, change "
+    "and share it, keeping the copyright notice. It comes with no warranty. " + COPYRIGHT + "."
 )
 
 # The help pages: `docs/wiki/`, built by `tools.wiki_site` and deployed to their own site.
@@ -74,6 +75,12 @@ NOTICES = (
     Notice("msgpack, PyYAML, repath and six", "Apache-2.0 and MIT", "supporting libraries"),
     Notice("Noto Sans, Math, Symbols 2 and SC", "SIL OFL 1.1", "symbols the browser lacks"),
     Notice("Roboto Mono", "Apache-2.0", "the code editor and the Scientific display"),
+    Notice("CodeMirror", "MIT", "the code editor"),
+    Notice(
+        "Flutter and its packages (KaTeX fonts, Material icons)",
+        "BSD-3-Clause, SIL OFL 1.1 and others: the full list is assets/NOTICES on the site",
+        "drawing the app",
+    ),
 )
 
 
