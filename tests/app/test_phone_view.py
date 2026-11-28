@@ -115,3 +115,28 @@ def test_tablets_bar_resizes_and_its_arrows_swap_the_keypad_and_screen() -> None
     row = app.layout.content
     assert isinstance(row, ft.Row)
     assert row.controls[-1] is app.view.control  # the keypad now on the left
+
+
+def test_tablets_bar_fits_its_arrows_and_follows_the_keyboard_setting() -> None:
+    from cassim.devices.nspire.ui.app import COLUMN_ARROW_W  # noqa: PLC0415
+    from cassim.devices.nspire.ui.layout import SIDE_SPLITTER  # noqa: PLC0415
+
+    assert SIDE_SPLITTER >= 2 * COLUMN_ARROW_W + 4  # < and > either side of the 4 px grip
+    app, _ = handheld_app(1200, 800)
+    app.set_mode(Mode.TABLET)
+    app.state.system.computer_column_controls = True
+    app.on_system_change()
+    row = app.layout.content
+    assert row is not None
+    buttons = [c for c in descendants(row) if isinstance(c, ft.IconButton)]
+    assert {b.tooltip for b in buttons} == {"Move the keypad left", "Move the screen right"}
+
+
+def test_a_phone_never_shows_the_keypad_moved_left() -> None:
+    """A phone has no bar to move it back, so the saved choice waits for a larger window."""
+    app, _ = handheld_app(915, 412)
+    app.state.system.keypad_first = True
+    app.set_mode(Mode.TABLET)
+    row = app.layout.content
+    assert isinstance(row, ft.Row)
+    assert row.controls[0] is app.view.control

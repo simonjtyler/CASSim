@@ -1,12 +1,14 @@
 # Requirements traced here: FR-DOC-001, FR-DOC-008
 """Exercise the Computer sidebar in the built app, including its rendered layout."""
 
+import contextlib
 import re
 from itertools import pairwise
 from pathlib import Path
 
 import pytest
 from playwright.sync_api import Browser, Locator, Page, expect
+from playwright.sync_api import Error as PlaywrightError
 from tests.e2e.test_flows_browser import AppPage
 
 from cassim.devices.nspire.ui.sidebar import LIST_BATCH
@@ -236,17 +238,25 @@ def test_pages_and_problems_render_fold_and_scroll(
 
 
 def solve_finance(app: AppPage) -> None:
+    """One attempt at the Finance Solver, each stage waited for. A stage that times out (a key
+    or a filled value dropped on a loaded machine) ends the attempt, and `until` tries again
+    from a clean screen."""
     page = app.page
-    for key in ("F2", "8", "1"):  # Menu > Finance > Finance Solver
-        app.press(key)
-    for label, value in (("N", "12"), ("I (%)", "6"), ("PV", "10000")):
-        page.get_by_label(label, exact=True).fill(value)
-    payment = page.get_by_label("Pmt", exact=True)
-    payment.click()
-    page.wait_for_timeout(500)
-    payment.press("Enter")
-    page.wait_for_timeout(1000)
-    button(page, "OK").click()
+    with contextlib.suppress(AssertionError, PlaywrightError):
+        for _ in range(2):  # a dialog or menu an earlier attempt left open
+            app.press("Escape")
+        for key in ("F2", "8", "1"):  # Menu > Finance > Finance Solver
+            app.press(key)
+        expect(page.get_by_label("N", exact=True)).to_be_visible(timeout=20_000)
+        for label, value in (("N", "12"), ("I (%)", "6"), ("PV", "10000")):
+            page.get_by_label(label, exact=True).fill(value)
+        payment = page.get_by_label("Pmt", exact=True)
+        payment.click()
+        page.wait_for_timeout(500)
+        payment.press("Enter")
+        expect(payment).not_to_have_value("", timeout=20_000)  # the dialog worked it out
+        button(page, "OK").click()
+        expect(button(page, "OK")).not_to_be_attached(timeout=20_000)
 
 
 def test_variables_stats_and_finance_render_fold_and_scroll(

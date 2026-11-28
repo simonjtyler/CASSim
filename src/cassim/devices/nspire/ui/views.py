@@ -220,8 +220,11 @@ POINTER_TICK = 1 / 30  # seconds between the pointer's moves
 
 # A hint that is a keyboard shortcut (Ctrl+N, Alt+Shift+H, F1, Esc): beside its menu item in
 # Computer view. Any other hint (a command's syntax, "Not in CASSim yet") goes under the menu.
+_MODIFIERS = r"(?:(?:Ctrl|Alt|Shift|Cmd)\+)"
+_NAMED_KEYS = r"(?:F\d{1,2}|Esc|Enter|Tab|Delete|Del|Home|End|Backspace|Insert|Page ?Up|Page ?Down)"
 _SHORTCUT = re.compile(
-    r"(?:(?:Ctrl|Alt|Shift|Cmd)\+)*(?:[A-Z0-9]|F\d{1,2}|Esc|Enter|Tab|Del)", re.I
+    rf"{_MODIFIERS}+\S"  # a modifier and one key: Ctrl+C, Ctrl+◀
+    rf"|{_MODIFIERS}*{_NAMED_KEYS}"  # a named key, alone or with modifiers: F1, Delete
 )
 
 

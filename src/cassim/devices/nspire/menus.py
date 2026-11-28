@@ -1156,8 +1156,8 @@ SHEET_MENU = MenuItem(
                 act("Select column", "select_column", "2"),
                 todo("Select formula range", "3"),
             ),
-            act("Go to", "goto", "4", "ctrl+G"),
-            act("Recalculate", "recalculate", "5", "ctrl+R"),
+            act("Go to", "goto", "4", "Ctrl+G"),
+            act("Recalculate", "recalculate", "5", "Ctrl+R"),
             act("Sort", "sort", "6", "a block first"),
         ),
         sub(
@@ -1267,9 +1267,9 @@ SHEET_MENU = MenuItem(
 )
 
 _CUT_COPY_PASTE = (
-    act("Cut", "cut", "1", "ctrl+X"),
-    act("Copy", "copy", "2", "ctrl+C"),
-    act("Paste", "paste", "3", "ctrl+V"),
+    act("Cut", "cut", "1", "Ctrl+X"),
+    act("Copy", "copy", "2", "Ctrl+C"),
+    act("Paste", "paste", "3", "Ctrl+V"),
 )
 
 # Context menus: a long press (touch), a right-click, or ctrl+menu.
