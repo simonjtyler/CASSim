@@ -254,7 +254,9 @@ def solve_finance(app: AppPage) -> None:
         payment.click()
         page.wait_for_timeout(500)
         payment.press("Enter")
-        expect(payment).not_to_have_value("", timeout=20_000)  # the dialog worked it out
+        # The browser's copy of the box does not show the payment Python works out, so give it
+        # a moment; the retry checks the stored tvm.pmt in the variables, which Python draws
+        page.wait_for_timeout(1000)
         button(page, "OK").click()
         expect(button(page, "OK")).not_to_be_attached(timeout=20_000)
 
@@ -276,8 +278,9 @@ def test_variables_stats_and_finance_render_fold_and_scroll(
     # A filled value can be dropped on a loaded machine; the list Python draws shows the solve.
     app.until(
         lambda: solve_finance(app),
-        lambda: "tvm.pv = 10000" in variables.inner_text(),
-        "tvm.pv = 10000 in the variables",
+        # the solved payment as well: an OK before the dialog worked it out stores Pmt = 0
+        lambda: all(text in variables.inner_text() for text in ("tvm.pv = 10000", "tvm.pmt = -")),
+        "tvm.pv = 10000 and a negative tvm.pmt in the variables",
     )
     expect(button(page, "Collapse tvm variables")).to_be_attached()
     box = variables.bounding_box()

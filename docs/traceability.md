@@ -301,6 +301,6 @@ CI runs `--check` (NFR-MAINT-006).
 | NFR-MAINT-006 | Must | `tests/unit/test_traceability.py` |
 | NFR-MAINT-005 | Should | `tests/unit/test_bundles.py` |
 | NFR-LEG-002 | Must | `tests/app/test_about.py`, `tests/app/test_cassim_menu.py`, `tests/app/test_stub_pages.py` |
-| NFR-LEG-003 | Must | `tests/app/test_about.py` |
+| NFR-LEG-003 | Must | `tests/app/test_about.py`, `tests/e2e/test_pwa.py` |
 | NFR-LEG-005 | Must | `tests/app/test_about.py` |
 | NFR-LEG-007 | Must | `corpus/pseudocode/seed.yaml` |
